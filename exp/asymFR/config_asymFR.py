@@ -1,4 +1,4 @@
-# Configuration for Assymetry Free Recall
+# Configuration for Asymmetry Free Recall
 
 """
 This module sets options for running Immediate Free Recall.
@@ -8,14 +8,18 @@ This module sets options for running Immediate Free Recall.
 nSessions = 2
 
 nLists = 16 # number of unique word lists
-listLength = 24
-wpfile = '../pools/ifr_wordpool.txt'
+listLength = 16
+wpfile = '../pools/asymfr_wordpool.txt'
 
 # word order
+lofile = 'list_order.txt'
+listDir = '../pools/'
+namefile = '../pools/list_names.txt'
+defaultBlockOrder = True
 wasfile = '../pools/ifr_was.txt'
-WASthresh = .55 # maximum acceptable WAS similarity between any pair of words
-maxTries = 1200 # maximum number of tries to create a list
-allowPrevSessWords = True
+#WASthresh = .55 # maximum acceptable WAS similarity between any pair of words
+#maxTries = 1200 # maximum number of tries to create a list
+#allowPrevSessWords = True
 
 # version file name
 svnVersionFile = 'version.txt'
@@ -72,6 +76,10 @@ wordDuration = 300
 wordISI = 1450
 jitter = 0
 
+# distractor
+preDistractDelay = 1000
+preDistractJitter = 0
+
 # retention
 preRecallDelay = 1200
 jitterBeforeRecall = 0
@@ -112,8 +120,8 @@ maxDistractorLimit = 8500
 minProblemTime = 400
 numberDuration = 400
 numberISI = 0
-probISI = 300
-probJitter = 200
+probISI = 400
+probJitter = 0
 setISI = 2000
 setJitter = 0
 

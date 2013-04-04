@@ -61,7 +61,7 @@ def prepare(exp, config):
     vsn.close()
 
     # set word order for this subject
-    (wp, subjItems) = prep.subjWordOrder(config)
+    (wp, subjItems) = prep.subjWordOrder(exp, config)
 
     # write out all the to-be-presented items to text files
     for i in range(config.nSessions):
@@ -142,8 +142,8 @@ def logEvent(log, ts, type,
     lineFormat = '%s\t' * (len(inputs) - 1) + '%s'
     log.logMessage(lineFormat % inputs, ts)
 
-def trial(exp, config, clock, state, log, video, audio, startBeep,
-          stopBeep, fixationCross):
+def trial(exp, config, clock, state, log, video, audio, mathlog,
+          startBeep, stopBeep, tf_bc, fixationCross):
     """
     Present a list of words, followed by a free recall period.
 
@@ -207,27 +207,37 @@ def trial(exp, config, clock, state, log, video, audio, startBeep,
         jitter = config.jitter
         clock.delay(isi, jitter)
 
+    # pre distractor delay
+    clock.delay(config.preDistractDelay, config.preDistractJitter)
+
     # distractor period
-    out = math.run_math_set(state.terms[state.trialNum],
-                            state.ops[i], 
-                            state.answers[i],
-                            set_proposed, clock = clock, 
+    t = state.trialNum
+    out = math.run_math_set(state.terms[t],
+                            state.ops[t], 
+                            state.answers[t],
+                            state.proposed[t], clock = clock, 
                             mathlog = mathlog,
                             minProblemTime = config.minProblemTime,
-                            textSize = config.textSize,
+                            textSize = config.wordHeight,
                             maxDistracterLimit = config.maxDistractorLimit,
-                            trialNum = state.setNum,
+                            trialNum = t,
                             tf_bc = tf_bc,
-                            tfKeys = tfkeys,
-                            fixation = fix,
+                            tfKeys = config.tfKeys,
+                            fixation = fixationCross,
                             presentSeq = config.presentSeq,
                             numberDuration = config.numberDuration,
                             numberISI = config.numberISI,
                             probISI = config.probISI,
                             probJitter = config.probJitter)
-    # JDM: WORK ON THIS    
-    
-    
+    (nCorrect, nProblems, startTime, probTimes, fix) = out
+
+    # log the distractor
+    logEvent(log, startTime, 'DISTRACTOR', trialno=t, item=nProblems, itemno=nCorrect)
+        
+    # get fixation ready to be cleared
+    if fix is not None:
+        video.unshow(fix)
+            
     # pause before recall
     clock.delay(config.preRecallDelay, config.jitterBeforeRecall)
 
@@ -287,6 +297,7 @@ def run(exp, config):
     audio = AudioTrack("audio")
     keyboard = KeyTrack("keyboard")
     log = LogTrack("session")
+    mathlog = LogTrack("math")
 
     # set the default font
     setDefaultFont(Font(config.defaultFont))
@@ -302,6 +313,10 @@ def run(exp, config):
                     config.stopBeepDur,
                     config.stopBeepRiseFall)
 
+    # create the button chooser for math distraction
+    tfkeys = config.tfKeys
+    tf_bc = ButtonChooser(Key(tfkeys[0]), Key(tfkeys[1]))
+    
     # get instructions buttons
     scroll = ButtonRoller(Key(config.downButton),
                           Key(config.upButton))
@@ -383,8 +398,8 @@ def run(exp, config):
         clock.delay(config.preListDelay)
 
         # run a trial (a trial is a word list)
-        trial(exp, config, clock, state, log, video, audio, startBeep,
-              stopBeep, fixationCross)
+        trial(exp, config, clock, state, log, video, audio, mathlog,
+              startBeep, stopBeep, tf_bc, fixationCross)
         
         # save the state after each trial
         state.trialNum += 1
