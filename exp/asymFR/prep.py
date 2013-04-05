@@ -57,7 +57,7 @@ def subjListOrder(exp, config):
         # order by latin square
         lcodes = copy(listOrder[order])
 
-        list_list = [];
+        list_list = [config.practList]; # initialize practice lists here
         for l in lcodes:
             list_list.append(listNames[int(l)])
 
