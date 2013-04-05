@@ -5,9 +5,9 @@ This module sets options for running Immediate Free Recall.
 """
 
 ### experiment structure ###
-nSessions = 2
+nSessions = 1
 
-nLists = 16 # number of unique word lists
+nLists = 15 # number of unique word lists
 listLength = 16
 wpfile = '../pools/asymfr_wordpool.txt'
 
@@ -68,12 +68,12 @@ files.extend(textFiles.values())
 
 # breaks
 instructISI = 500
-preListDelay = 1500
+preListDelay = 1000
 breakDuration = 5000
 
 # study
-wordDuration = 300
-wordISI = 1450
+wordDuration = 3000
+wordISI = 1000
 jitter = 0
 
 # distractor
@@ -81,11 +81,11 @@ preDistractDelay = 1000
 preDistractJitter = 0
 
 # retention
-preRecallDelay = 1200
+preRecallDelay = 1000
 jitterBeforeRecall = 0
 
 # test
-recallDuration = 75000
+recallDuration = 90000
 
 # DISTRACTOR
 # math problem options
@@ -116,7 +116,7 @@ excludeRepeats = True
 # distribution of times will depend on the specific timing parameters
 displayCorrect = False
 presentSeq = True
-maxDistractorLimit = 8500
+maxDistractorLimit = 10000
 minProblemTime = 400
 numberDuration = 400
 numberISI = 0
