@@ -7,7 +7,7 @@ This module sets options for running Immediate Free Recall.
 ### experiment structure ###
 nSessions = 1
 
-nLists = 15 # number of unique word lists
+nLists = 16 # number of unique word lists
 listLength = 16
 wpfile = '../pools/asymfr_wordpool.txt'
 
@@ -15,8 +15,8 @@ wpfile = '../pools/asymfr_wordpool.txt'
 lofile = 'list_order.txt'
 listDir = '../pools/'
 namefile = '../pools/list_names.txt'
+practList = 'pract.txt'
 defaultBlockOrder = False
-#maxTries = 1200 # maximum number of tries to create a list
 #allowPrevSessWords = True
 
 # version file name
