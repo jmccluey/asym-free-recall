@@ -41,11 +41,12 @@ def subjListOrder(exp, config):
     nameLines = namefile.readlines()
     for nameLine in nameLines:
         listNames.append(nameLine.strip())
+    verifyFiles
 
     # order balanced by subject number
     if config.defaultBlockOrder or subjnum is None:
         # if no subject number, use default
-        subjnum = 1;
+        subjnum = 0;
     else:
         subjnum = int(subjnum.group(1))
 
@@ -91,9 +92,6 @@ def listWordOrder(list_lo, list_dir, listLength):
     global wp_allowed
 
     # list method
-    # 
-    print list_lo
-
     words = []
     listfile = list_dir+list_lo
     listfile = open(listfile, 'r')
@@ -220,8 +218,12 @@ def subjWordOrder(exp, config):
                                                    prev_sess_words,
                                                    config)
         subj_wo.append(sess_wo)
-    print subj_wo
-    return wp_tot, subj_wo
+
+        # strip '.txt' from lo now that we're done with it
+        for l in xrange(len(subj_lo[n])):
+            subj_lo[n][l] = subj_lo[n][l][:-4]
+    
+    return wp_tot, subj_wo, subj_lo
 
 def verifyFiles(files):
     """
