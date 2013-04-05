@@ -15,9 +15,7 @@ wpfile = '../pools/asymfr_wordpool.txt'
 lofile = 'list_order.txt'
 listDir = '../pools/'
 namefile = '../pools/list_names.txt'
-defaultBlockOrder = True
-wasfile = '../pools/ifr_was.txt'
-#WASthresh = .55 # maximum acceptable WAS similarity between any pair of words
+defaultBlockOrder = False
 #maxTries = 1200 # maximum number of tries to create a list
 #allowPrevSessWords = True
 
@@ -60,8 +58,7 @@ textFiles['introGetReady'] = 'text/introGetReady.txt'
 textFiles['trialBreak'] = 'text/trialBreak.txt'
 textFiles['endBreak'] = 'text/endBreak.txt'
 
-files = [wpfile,
-         wasfile]
+files = [wpfile]
 files.extend(textFiles.values())
 
 ### timing ###

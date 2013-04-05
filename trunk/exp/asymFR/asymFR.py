@@ -61,7 +61,7 @@ def prepare(exp, config):
     vsn.close()
 
     # set word order for this subject
-    (wp, subjItems) = prep.subjWordOrder(exp, config)
+    (wp, subjItems, subjListOrder) = prep.subjWordOrder(exp, config)
 
     # write out all the to-be-presented items to text files
     for i in range(config.nSessions):
@@ -95,6 +95,7 @@ def prepare(exp, config):
     exp.saveState(state,
                   wp=wp,
                   subjItems=subjItems,
+                  subjListOrder=subjListOrder,
                   sessionNum=0,
                   trialNum=0,
                   terms=terms,
@@ -115,6 +116,7 @@ def formatStr(format, input):
 
 def logEvent(log, ts, type,
              trialno=None,
+             listname=None,
              item=None,
              itemno=None):
     """
@@ -136,6 +138,7 @@ def logEvent(log, ts, type,
     # as an empty string.
     inputs = (formatStr('%s', type),
               formatStr('%s', trialno),
+              formatStr('%s', listname),
               formatStr('%s', item),
               formatStr('%s', itemno))
 
@@ -176,6 +179,9 @@ def trial(exp, config, clock, state, log, video, audio, mathlog,
     PLD W ISI W ISI ... W ISI PRD R
     """
 
+    # get the list name
+    listname = state.subjListOrder[state.sessionNum][state.trialNum]
+
     # PRESENT THE LIST
     for n in range(config.listLength):
 
@@ -192,9 +198,9 @@ def trial(exp, config, clock, state, log, video, audio, mathlog,
         ts = video.updateScreen(clock)
         clock.delay(config.wordDuration)
 
-        # log the word
-        logEvent(log, ts, 'FR_PRES', trialno=state.trialNum, item=item,
-                 itemno=itemInd)
+        # log the word 
+        logEvent(log, ts, 'FR_PRES', trialno=state.trialNum, listname=listname,
+                 item=item, itemno=itemInd)
 
         # show the fixation cross
         video.clear()
