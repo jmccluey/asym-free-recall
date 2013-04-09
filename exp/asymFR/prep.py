@@ -208,7 +208,6 @@ def subjWordOrder(exp, config):
     #    semMat.append(wordVals)
     
     subj_lo = subjListOrder(exp, config)
-    print subj_lo
     
     subj_wo = []
     prev_sess_words = []
