@@ -1,4 +1,4 @@
-After the last word in each list, you will be given the task of
+After the last item in each list, you will be given the task of
 solving math problems. Two numbers will flash on the screen,
 followed by "=", then another number.
 
