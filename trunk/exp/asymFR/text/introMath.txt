@@ -1,0 +1,8 @@
+After the last word in each list, you will be given the task of
+solving math problems. Two numbers will flash on the screen,
+followed by "=", then another number.
+
+You will be asked to press a key to indicate whether adding the
+first two numbers gives the last number.
+
+* Please press RETURN to continue *

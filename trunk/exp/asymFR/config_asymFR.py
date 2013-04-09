@@ -52,6 +52,9 @@ exitButton = 'RETURN'
 textFiles = dict()
 
 textFiles['introSess'] = 'text/introSess.txt'
+textFiles['introMath'] = 'text/introMath.txt'
+textFiles['introMathResponses'] = 'text/introMathResponses.txt'
+textFiles['introMathPractice'] = 'text/introMathPractice.txt'
 textFiles['introRecall'] = 'text/introRecall.txt'
 textFiles['introQuestions'] = 'text/introQuestions.txt'
 textFiles['introGetReady'] = 'text/introGetReady.txt'
@@ -82,7 +85,7 @@ preRecallDelay = 1000
 jitterBeforeRecall = 0
 
 # test
-recallDuration = 90000
+recallDuration = 75000
 
 # DISTRACTOR
 # math problem options
@@ -121,6 +124,8 @@ probISI = 400
 probJitter = 0
 setISI = 2000
 setJitter = 0
+
+maxPracticeMath = 15000
 
 # responses
 tfKeys = ['N','M']

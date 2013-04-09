@@ -239,7 +239,10 @@ def trial(exp, config, clock, state, log, video, audio, mathlog,
 
     # log the distractor
     logEvent(log, startTime, 'DISTRACTOR', trialno=t, item=nProblems, itemno=nCorrect)
-        
+    # update tcorrect in state
+    state.tcorrect += nCorrect
+    exp.saveState(state)
+    
     # get fixation ready to be cleared
     if fix is not None:
         video.unshow(fix)
@@ -365,6 +368,46 @@ def run(exp, config):
 
         # show complete instructions
         customInstruct('introSess')
+        
+        customInstruct('introMath')
+        customInstruct('introMathResponses')
+        customInstruct('introMathPractice')
+
+        # practice math
+        set_config = math.prep_math_set(config.numVars,
+                                        config.minNum, 
+                                        config.maxNum, 
+                                        config.maxProbs, 
+                                        config.plusAndMinus, 
+                                        config.ansMod, 
+                                        config.ansProb,
+                                        config.tfProblems, 
+                                        config.uniqueVars, 
+                                        config.excludeRepeats)
+        (terms, ops, answers, proposed) = set_config
+        
+        # present a fixed interval of math problems
+        out = math.run_math_set(terms, ops, answers, proposed,
+                                clock = clock, mathlog = mathlog,
+                                minProblemTime = config.minProblemTime,
+                                textSize = config.wordHeight,
+                                maxDistracterLimit = config.maxPracticeMath,
+                                trialNum = -1,
+                                tf_bc = tf_bc,
+                                tfKeys = tfkeys,
+                                fixation = fixationCross,
+                                presentSeq = config.presentSeq,
+                                numberDuration = config.numberDuration,
+                                numberISI = config.numberISI,
+                                probISI = config.probISI,
+                                probJitter = config.probJitter)
+        (nCorrect, nProblems, startTime, probTimes, fixDisp) = out
+
+        if fixDisp is not None:
+            video.unshow(fixDisp)
+            video.updateScreen(clock)
+
+        
         customInstruct('introRecall')
 
         # pause for questions
@@ -412,15 +455,20 @@ def run(exp, config):
         exp.saveState(state)
 
     # END OF SESSION
+    # log math score
+    logEvent(log, timestamp, 'MATH_TOTAL_SCORE', trialno=state.tcorrect)
+    
     # set the state for the beginning of the next session
     state.sessionNum += 1
     state.trialNum = 0
+    state.tcorrect = 0
     exp.saveState(state)
 
     # tell the participant and log that we're done
     timestamp = waitForAnyKey(clock, Text(config.sessionEndText))
-    logEvent(log, timestamp, 'SESS_END')
 
+    logEvent(log, timestamp, 'SESS_END')
+    
     # wait for the clock to catch up
     clock.wait()
 
