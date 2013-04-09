@@ -72,8 +72,8 @@ preListDelay = 1000
 breakDuration = 5000
 
 # study
-wordDuration = 3000
-wordISI = 1000
+wordDuration = 2000
+wordISI = 500
 jitter = 0
 
 # distractor
