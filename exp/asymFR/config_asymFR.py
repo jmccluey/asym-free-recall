@@ -56,10 +56,12 @@ textFiles['introMath'] = 'text/introMath.txt'
 textFiles['introMathResponses'] = 'text/introMathResponses.txt'
 textFiles['introMathPractice'] = 'text/introMathPractice.txt'
 textFiles['introRecall'] = 'text/introRecall.txt'
+textFiles['introFinal'] = 'text/introFinal.txt'
 textFiles['introQuestions'] = 'text/introQuestions.txt'
 textFiles['introGetReady'] = 'text/introGetReady.txt'
 textFiles['trialBreak'] = 'text/trialBreak.txt'
 textFiles['endBreak'] = 'text/endBreak.txt'
+textFiles['prepareFFR'] = 'text/prepareFFR.txt'
 
 files = [wpfile]
 files.extend(textFiles.values())
@@ -82,10 +84,12 @@ preDistractJitter = 0
 
 # retention
 preRecallDelay = 1000
+preFinalDelay = 1000
 jitterBeforeRecall = 0
 
 # test
 recallDuration = 75000
+ffrDuration = 270000
 
 # DISTRACTOR
 # math problem options

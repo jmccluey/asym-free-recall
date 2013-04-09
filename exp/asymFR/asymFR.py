@@ -98,6 +98,7 @@ def prepare(exp, config):
                   subjListOrder=subjListOrder,
                   sessionNum=0,
                   trialNum=0,
+                  blockNum=0,
                   terms=terms,
                   ops=ops,
                   answers=answers,
@@ -409,6 +410,7 @@ def run(exp, config):
 
         
         customInstruct('introRecall')
+        customInstruct('introFinal')
 
         # pause for questions
         customInstruct('introQuestions')
@@ -419,49 +421,99 @@ def run(exp, config):
     video.clear("black")
     video.updateScreen(clock)
     
-    # check if we're still presenting lists
-    while state.trialNum < config.nLists:
-
-        if state.trialNum > 0:
-            # minimum break duration
-            breakText = Text(open(config.textFiles['trialBreak'],'r').read())
-            breakStim = video.showCentered(breakText)
+    if state.blockNum==0:
+        # check if we're still presenting lists
+        while state.trialNum < config.nLists:
+            
+            if state.trialNum > 0:
+                # minimum break duration
+                breakText = Text(open(config.textFiles['trialBreak'],'r').read())
+                breakStim = video.showCentered(breakText)
+                video.updateScreen(clock)
+                video.unshow(breakStim)
+                clock.delay(config.breakDuration)
+                
+                # after break, wait for participant to continue
+                if config.breakSubjectControl:
+                    endBreakText = Text(open(config.textFiles['endBreak'],'r').read())
+                    timestamp = waitForAnyKey(clock, endBreakText)
+                    
+                    # log break
+                    logEvent(log, timestamp, 'REST')
+                    
+            # fixation cross
+            fix = video.showCentered(fixationCross)
             video.updateScreen(clock)
-            video.unshow(breakStim)
-            clock.delay(config.breakDuration)
+            video.unshow(fix)
+            
+            # wait a bit before starting
+            clock.delay(config.preListDelay)
+            
+            # run a trial (a trial is a word list)
+            trial(exp, config, clock, state, log, video, audio, mathlog,
+                  startBeep, stopBeep, tf_bc, fixationCross)
+            
+            # save the state after each trial
+            state.trialNum += 1
+            exp.saveState(state)
 
-            # after break, wait for participant to continue
-            if config.breakSubjectControl:
-                endBreakText = Text(open(config.textFiles['endBreak'],'r').read())
-                timestamp = waitForAnyKey(clock, endBreakText)
+        # log math score
+        logEvent(log, timestamp, 'MATH_TOTAL_SCORE', trialno=state.tcorrect)
+        
+        # move to next block, reset trial counter, save state
+        state.blockNum += 1
+        state.trialNum = 0
+        state.tcorrect = 0
+        exp.saveState(state)
 
-                # log break
-                logEvent(log, timestamp, 'REST')
+    if state.blockNum==1:
+        # screen before final free recall instructions
+        msg = Text("Thank you!\nPress any key to continue.")
+        waitForAnyKey(clock, msg, excludeKeys=config.exitButton)
 
-        # fixation cross
+        clock.delay(config.preFinalDelay)
+        
+        # ffr instructions
+        customInstruct('prepareFFR')
+        logEvent(log, clock.get(), 'FFR_START')
+
+        clock.delay(config.preFinalDelay, config.jitterBeforeRecall)
+
+        # RECALL
+        # show the recall start indicator
+        startText = video.showCentered(Text(config.recallStartText,
+                                            size=config.wordHeight))
+        video.updateScreen(clock)
+        startBeep.present(clock)
+        
+        # hide rec start text
+        video.unshow(startText)
+        video.updateScreen(clock)
+        
+        # show the fixation cross
         fix = video.showCentered(fixationCross)
         video.updateScreen(clock)
         video.unshow(fix)
-
-        # wait a bit before starting
-        clock.delay(config.preListDelay)
-
-        # run a trial (a trial is a word list)
-        trial(exp, config, clock, state, log, video, audio, mathlog,
-              startBeep, stopBeep, tf_bc, fixationCross)
         
-        # save the state after each trial
-        state.trialNum += 1
+        # Record responses, log the rec start
+        (rec, timestamp) = audio.record(config.ffrDuration,
+                                        'ffr',
+                                        t=clock)
+        logEvent(log, timestamp, 'REC_START')
+
+        # end of recall period
+        stopBeep.present(clock)
+        video.updateScreen(clock)
+
+        # move to next block, save state
+        state.blockNum += 1
         exp.saveState(state)
 
+
     # END OF SESSION
-    # log math score
-    logEvent(log, timestamp, 'MATH_TOTAL_SCORE', trialno=state.tcorrect)
-    
     # set the state for the beginning of the next session
     state.sessionNum += 1
-    state.trialNum = 0
-    state.tcorrect = 0
+    state.blockNum = 0
     exp.saveState(state)
 
     # tell the participant and log that we're done
