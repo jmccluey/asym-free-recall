@@ -68,7 +68,7 @@ temp = read_session_log(session_log_file, {'mstime', 'msoffset', 'type'}, ...
 header_lines = max([find(strcmp({temp.type}, 'SESS_START')) 0]);
 
 % read the log file
-fields = {'mstime' 'msoffset' 'type' 'trial' 'listname' 'item' 'itemno'};
+fields = {'mstime' 'msoffset' 'type' 'trial' 'list_name' 'item' 'itemno'};
 format = {'%n'     '%n'       '%s'   '%n'    '%s'       '%s'   '%n'};
 full_log = read_session_log(session_log_file, fields, format, ...
                             'header_lines', header_lines);
@@ -116,7 +116,7 @@ for log=full_log
     event = event_template(current, log, 'WORD');
     event.item = upper(deblank(log.item));
     event.itemno = log.itemno;
-    event.list = log.listname;
+    event.list = log.list_name;
     event.serialpos = current.list_pos;
     
     % move to next item
