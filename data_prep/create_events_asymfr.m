@@ -177,7 +177,7 @@ for log=full_log
     
     if strcmp(current.block, 'fr')
       [list_study_events.recalled] = deal(0);
-      fr_event = read_free_recall(list_study_events, log.mstime, ...
+      fr_events = read_free_recall(list_study_events, log.mstime, ...
                                   ann_file);
       
       % recalled field undefined for REC_START
