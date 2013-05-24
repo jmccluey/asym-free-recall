@@ -1,0 +1,15 @@
+tool_carp.txt
+tool_gard.txt
+tool_gen1.txt
+tool_gen2.txt
+vehi_land.txt
+vehi_gen1.txt
+vehi_gen2.txt
+food_fruit.txt
+food_junk.txt
+food_gen1.txt
+food_gen2.txt
+anim_farm.txt
+anim_sea.txt
+anim_gen1.txt
+anim_gen2.txt
