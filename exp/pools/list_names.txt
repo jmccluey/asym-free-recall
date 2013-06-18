@@ -1,15 +1,24 @@
-tool_carp.txt
-tool_gard.txt
-tool_gen1.txt
-tool_gen2.txt
-vehi_land.txt
-vehi_gen1.txt
-vehi_gen2.txt
-food_fruit.txt
-food_junk.txt
-food_gen1.txt
-food_gen2.txt
-anim_farm.txt
-anim_sea.txt
-anim_gen1.txt
-anim_gen2.txt
+birds.txt
+body parts.txt
+car models.txt
+cities.txt
+clothes.txt
+colors.txt
+countries.txt
+elements.txt
+fish.txt
+four-footed animals.txt
+fruit.txt
+geography terms.txt
+insects.txt
+instruments.txt
+kitchen tools.txt
+music styles.txt
+occupations.txt
+reading materials.txt
+seasonings.txt
+ships.txt
+sports.txt
+states.txt
+vegetables.txt
+weather terms.txt
