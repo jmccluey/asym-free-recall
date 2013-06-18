@@ -54,7 +54,7 @@ IFS=$'\n'
 LISTFILES=`ls [0-9].lst`
 for l in $LISTFILES; do
     TRIAL=`echo $l | cut -c 1`
-    echo '\textbf{Trial '$[TRIAL+1]'}:' >> $OUTFILE
+    echo '\textbf{Trial '$[TRIAL+1]'}: \rule{0.3in}{0.25mm}/12' >> $OUTFILE
     echo >> $OUTFILE
     echo '\begin{itemize}\itemsep0pt' >> $OUTFILE
     ITEMS=`cat $l`
@@ -65,14 +65,15 @@ for l in $LISTFILES; do
     echo '\end{itemize}' >> $OUTFILE
     echo >> $OUTFILE
     echo "\vspace{0.2in}" >> $OUTFILE
-    echo Number of Items Recalled -- "\rule{0.3in}{0.25mm}"/16 >> $OUTFILE
-    echo "\newpage">> $OUTFILE
+    #echo Number of Items Recalled -- "\rule{0.3in}{0.25mm}"/12 >> $OUTFILE
+    #echo "\newpage">> $OUTFILE
+    echo "\\" >> $OUTFILE
 done
 # now 10.lst through 99.lst
 LISTFILES=`ls [0-9][0-9].lst`
 for l in $LISTFILES; do
     TRIAL=`echo $l | cut -c 1,2`
-    echo '\textbf{Trial '$[TRIAL+1]'}:' >> $OUTFILE
+    echo '\textbf{Trial '$[TRIAL+1]'}: \rule{0.3in}{0.25mm}/12' >> $OUTFILE
     echo >> $OUTFILE
     echo '\begin{itemize}\itemsep0pt' >> $OUTFILE
     ITEMS=`cat $l`
@@ -83,9 +84,14 @@ for l in $LISTFILES; do
     echo '\end{itemize}' >> $OUTFILE
     echo >> $OUTFILE
     echo "\vspace{0.2in}" >> $OUTFILE
-    echo Number of Items Recalled -- "\rule{0.3in}{0.25mm}"/16 >> $OUTFILE
-    echo "\newpage">> $OUTFILE
+    #echo Number of Items Recalled -- "\rule{0.3in}{0.25mm}"/12 >> $OUTFILE
+    #echo "\newpage">> $OUTFILE
 done
+
+# handle items with special characters (e.g., R & B)
+BUFFER=`cat $OUTFILE | sed 's/R \& B/R \\\\\& B/'`
+echo "$BUFFER" > $OUTFILE
+
 # compile
 pdflatex $CHECKFILE
 pdflatex $CHECKFILE

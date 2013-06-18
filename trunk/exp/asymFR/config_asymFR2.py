@@ -114,8 +114,8 @@ preFinalDelay = 1000
 jitterBeforeRecall = 0
 
 # test
-recallDuration = 75000
-ffrDuration = 270000
+recallDuration = 45000
+ffrDuration = 360000
 
 # DISTRACTOR
 # math problem options
