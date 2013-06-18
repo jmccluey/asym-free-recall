@@ -9,39 +9,74 @@ import os
 import sys
 import re
 from copy import copy
+from expdesign import balanceSessions
 
-def subjListOrder(exp, config):
+def sessCatOrder(sess_conds, subj_cbcat, categories, pract_cat, list_length):
     """
-    Sets the order of the lists.
+    """
+
+    # sort categories for use
+    poss_cats = subj_cbcat[:]
+    nCatLists = sess_conds.count(1)
+
+    # categories for categorized lists
+    cat_cats = [] # categories for categorized lists
+    for c in range(0,nCatLists):
+        cat_cats.extend([poss_cats.pop(0)])
+
+    sess_co = []
+    sess_cat = []
+    for j in range(len(sess_conds)):
+        list_co = []
+        list_cat = []
+        if sess_conds[j] == -1:
+            # practice list
+            list_co = [-1]*list_length
+            list_cat = [pract_cat]*list_length
+
+        elif sess_conds[j] == 0:
+            # uncategorized list
+            # sample from available categories
+            list_co = random.sample(poss_cats, list_length)
+            for j in list_co:
+                list_cat.append(categories[j])
+            
+        elif sess_conds[j] == 1:
+            # categorized list
+            cat = cat_cats.pop(0)
+            list_co = [cat]*list_length
+            list_cat = [categories[cat]]*list_length
+
+        else:
+            print "ERROR: Invalid list condition.\n\n"
+
+        sess_co.append(list_co[:])
+        sess_cat.append(list_cat[:])
+
+    return sess_co, sess_cat
+
+def subjCatOrder(exp, config):
+    """
+    Sets the order of categories for a subject.
 
     INPUTS:
     ------
-    exp: Experiment object.
-    config : Configuration
+    exp : Experiment object.
+    config: : Configuration
     """
-    
-    # NOTE: currently sets same order across all sessions!
-    # should be amended for multi-session study
-    
+
+    # set categorized lists by subject order
     subjnumRegex = re.compile('(\d+)')
 
     subjID = exp.options['subject']
+    #subjID = 'ASM005'
     subjnum = subjnumRegex.search(subjID)
 
-    subj_lists = [None]*config.nSessions
-
     listOrder = []
-    lofile = open(config.lofile, 'r')
+    lofile = open(config.cofile, 'r')
     loLines = lofile.readlines()
     for loLine in loLines:
         listOrder.append(loLine.strip().split('\t'))
-
-    listNames = []
-    namefile = open(config.namefile, 'r')
-    nameLines = namefile.readlines()
-    for nameLine in nameLines:
-        listNames.append(nameLine.strip())
-    verifyFiles
 
     # order balanced by subject number
     if config.defaultBlockOrder or subjnum is None:
@@ -50,179 +85,127 @@ def subjListOrder(exp, config):
     else:
         subjnum = int(subjnum.group(1))
 
-    order = subjnum % len(listOrder)
+    # subjnums are 1-indexed, make 0-indexed
+    order = (subjnum - 1) % len(listOrder)
 
-    # set list order for each session
-    for sessnum in xrange(config.nSessions):
-        # order by latin square
-        lcodes = copy(listOrder[order])
+    # counterbalanced category set
+    subj_cbcat = listOrder[order][:]
+    for n in xrange(len(subj_cbcat)):
+        subj_cbcat[n] = int(subj_cbcat[n])
 
-        list_list = [config.practList]; # initialize practice lists here
-        for l in lcodes:
-            list_list.append(listNames[int(l)])
+    
+    # category condition
+    subj_conds = balanceSessions(config.catCond, config.nLists,
+                                 config.nSessions, shuffleType='set')
+    
+    # add practice to first session
+    pract_conds = [-1]*config.nPractLists
+    fs_conds = pract_conds[:]
+    fs_conds.extend(subj_conds[0][:])
+    subj_conds[0] = fs_conds[:]
 
-        subj_lists[sessnum] = copy(list_list)
+    #print 'Preparing subject...'
 
-    return subj_lists
+    subj_co = []
+    subj_cat = []
+    for i in range(len(subj_conds)):
+        #print i
+        sess_co = []
+        sess_cat = []
+        
+        (sess_co, sess_cat) = sessCatOrder(subj_conds[i],
+                                           subj_cbcat,
+                                           config.categories,
+                                           config.practCat,
+                                           config.listLength)
 
-def listWAScheck(wordInds, WASthresh):
+        subj_co.append(sess_co[:])
+        subj_cat.append(sess_cat[:])
+
+    return subj_co, subj_cat
+    
+def cpCatList(catlist):
     """
-    Check if similarity between any two words in a list exceeds some
-    threshold.
+    Make a copy of a list of lists
     """
-    # check to make sure no two words in the list are too similar
-    listGood = True
-    for word1 in wordInds:
-        for word2 in wordInds:
-            val = semMat[word1][word2]
-            if val >= WASthresh and val < 1:
-                listGood = False
-                return listGood
-    return listGood
+    cat_copy = []
+    for cat in range(len(catlist)):
+	cat_copy.append(catlist[cat][:])
+    return cat_copy
 
-def listWordOrder(list_lo, list_dir, listLength):
+def extractPools(pool_dir, name_file, pract_file):
     """
-    Create one list of words according to certain criteria.  Lists are
-    randomly created from available words listed in wp_allowed, and
-    rejected if they fail the following test:
-
-    Using WAS values, make sure no two words have higher semantic
-    similarity than WASthresh.
+    Extract category and practice word pools from text files.
     """
-    global wp_allowed
 
-    # list method
-    words = []
-    listfile = list_dir+list_lo
-    listfile = open(listfile, 'r')
-    listLines = listfile.readlines()
-    for listLine in listLines:
-        words.append(listLine.strip())
+    wps = []
+    wptot = []
 
-    list_wo = random.sample(words, listLength)
+    # extract wordpools
+    filenames = []
+    nmfile = open(name_file, 'r')
+    nmLines = nmfile.readlines()
+    for nmLine in nmLines:
+        filenames.append(nmLine.strip())
 
-    ## wordpool method
-    # create a list with random words;  if it fails, try again
-    #listPass = False
-    #nTries = 0
-    #while not listPass:
-    #    nTries += 1
-    #    if nTries == maxTries:
-    #        print 'Warning: maximum tries to create list reached.'
-    #        break
-    #
-    #    # make a copy of allowed words so we can pop them
-    #    wp_temp = wp_allowed[:]
-    #
-    #    # make a list from allowed words
-    #    listPass = True
-    #    list_wo = []
-    #    list_inds = []
-    #
-    #    for n in xrange(listLength):
-    #        # take a random item from allowed words
-    #        item = wp_temp.pop(random.choice(range(len(wp_temp))))
-    #
-    #        # get the absolute index in the complete wordpool
-    #        ind = wp_tot.index(item)
-    #
-    #        # store the item and itemno
-    #        list_wo.append(item)
-    #        list_inds.append(ind)
-    #
-    #    # test: no two words on list too similar
-    #    if not listWAScheck(list_inds, WASthresh):
-    #        listPass = False
-    #        continue
-    #
-    ## if list passes, list words are now unavailable
-    #wp_allowed = wp_temp[:]
-    return list_wo
+    for fname in filenames:
+        cat_wp = []
 
-def sessWordOrder(sess_lo, prev_sess_words, config):
-    """
-    Create word lists to be presented in one session.
-    """
-    global wp_allowed
+        catin = open(pool_dir+fname,'r')
+        wpin = catin.readlines()
+        for w in wpin:
+            cat_wp.append(w.strip())
 
-    # create lists and add words to session
-    sess_wo = []
-    sess_words = []
-    for n in xrange(config.nLists):
-        list_wo = listWordOrder(sess_lo[n], config.listDir, config.listLength)
-        sess_wo.append(list_wo)
-        sess_words.extend(list_wo)
+        wps.append(cat_wp)
+        wptot.extend(cat_wp)
 
-    ## does not apply for pre-made lists
-    #if config.allowPrevSessWords:
-    #    # current session's words are now free to be used again
-    #    wp_allowed.extend(sess_words)
-    #else:
-    #    # only previous session's words are free to be used again
-    #    wp_allowed.extend(prev_sess_words)
+    wpp = []
 
-    return sess_wo, sess_words
+    # extract practice wordpool
+    practin = open(pract_file, 'r')
+    wppin = practin.readlines()
+    for w in wppin:
+        wpp.append(w.strip())
 
-def subjWordOrder(exp, config):
+    return wps, wptot, wpp
+
+def subjWordOrder(subj_co, wp_cat, wp_pract):
     """
     Create the order of presentation of stimuli for one subject.
-    Words can be repeated, but not within a session, and only in
-    adjacent sessions if specified in the config (see
-    allowPrevSessWords).
-
-    Inputs
-    ______
-    config : config
-        Configuration object for a subject.
-
-    Outputs
-    _______
-    wordpool_total : A complete list of the words that stimuli were
-                     drawn from
-
-    subj_word_order : A list of lists of lists giving a string of each
-                      word to be presented in the experiment.  To
-                      access the word to be presented at session i,
-                      list j, item k:
-                      subj_word_order[i][j][k]
     """
-    global wp_tot, wp_allowed, semMat
+    wps_allowed = cpCatList(wp_cat)
+    wpp_allowed = cpCatList(wp_pract)
 
-    # read in the wordpool
-    wp_tot = []
-    wpfile = open(config.wpfile, 'r')
-    wpLines = wpfile.readlines()
-    for wpLine in wpLines:
-        wp_tot.append(wpLine.strip())
-    wp_allowed = wp_tot[:]
-
-    # read in WAS values for each possible pair of words
-    #semMat = []
-    #wasfile = open(config.wasfile, 'r')
-    #for word in wasfile:
-    #    wordVals = []
-    #    wordValsString = word.split()
-    #    for val in wordValsString:
-    #        thisVal = float(val)
-    #        wordVals.append(thisVal)
-    #    semMat.append(wordVals)
-    
-    subj_lo = subjListOrder(exp, config)
+    wps_temp = cpCatList(wps_allowed)
+    wpp_temp = cpCatList(wpp_allowed)
     
     subj_wo = []
-    prev_sess_words = []
-    for n in xrange(config.nSessions):
-        # generate lists for this session
-        (sess_wo, prev_sess_words) = sessWordOrder(subj_lo[n],
-                                                   prev_sess_words,
-                                                   config)
+    for sess_co in subj_co:
+        sess_wo = []
+        
+        for list_co in sess_co:
+            list_wo = []
+            
+            for cat in list_co:
+                if cat == -1:
+                    # practice item
+                    ind = random.choice(range(len(wpp_temp)))
+                    item = wpp_temp.pop(ind)
+                    list_wo.append(item)
+                    wpp_allowed = cpCatList(wpp_temp)
+                else:
+                    # categoried item
+                    ind = random.choice(range(len(wps_temp[cat])))
+                    item = wps_temp[cat].pop(ind)
+                    list_wo.append(item)
+                    wps_allowed = cpCatList(wps_temp)
+
+            sess_wo.append(list_wo)
+
         subj_wo.append(sess_wo)
 
-        # strip '.txt' from lo now that we're done with it
-        for l in xrange(len(subj_lo[n])):
-            subj_lo[n][l] = subj_lo[n][l][:-4]
+    return subj_wo
     
-    return wp_tot, subj_wo, subj_lo
 
 def verifyFiles(files):
     """
@@ -236,42 +219,42 @@ def verifyFiles(files):
             print "\nERROR:\nPath/File does not exist: %s\n\nPlease verify the config.\n" % f
             sys.exit(1)
 
-def estimateTotalTime(config):
-    """
-    Calculates time (in minutes) from the start of the experiment to
-    the end of the experiment, including rewetting time.
+## def estimateTotalTime(config):
+##     """
+##     Calculates time (in minutes) from the start of the experiment to
+##     the end of the experiment, including rewetting time.
 
-    Timing of one list:
+##     Timing of one list:
 
-    Code  Name                     Config Variable
-    ______________________________________________
-    PLD   pre-list delay           preListDelay
-    W     word presentation        wordDuration
-    ISI   inter-stimulus interval  wordISI + jitter/2
-    PRD   pre-recall delay         preRecallDelay + jitterBeforeRecall/2
-    R     recall period            recallDuration
+##     Code  Name                     Config Variable
+##     ______________________________________________
+##     PLD   pre-list delay           preListDelay
+##     W     word presentation        wordDuration
+##     ISI   inter-stimulus interval  wordISI + jitter/2
+##     PRD   pre-recall delay         preRecallDelay + jitterBeforeRecall/2
+##     R     recall period            recallDuration
 
-    IFR:
-    PLD W ISI W ISI ... W ISI PRD R
-    """
+##     IFR:
+##     PLD W ISI W ISI ... W ISI PRD R
+##     """
     
-    # mean time for list items
-    itemTime = config.wordDuration + config.wordISI + config.jitter/2
-    print 'Item: ' + str(itemTime)
+##     # mean time for list items
+##     itemTime = config.wordDuration + config.wordISI + config.jitter/2
+##     print 'Item: ' + str(itemTime)
 
-    # mean list time
-    listTime = config.preListDelay + itemTime*config.listLength + \
-               (config.preRecallDelay + config.jitterBeforeRecall/2) + \
-               config.recallDuration
-    print 'List: ' + str(listTime)
+##     # mean list time
+##     listTime = config.preListDelay + itemTime*config.listLength + \
+##                (config.preRecallDelay + config.jitterBeforeRecall/2) + \
+##                config.recallDuration
+##     print 'List: ' + str(listTime)
 
-    instruct = 300000 # getting through instructions
-    listBreak = config.breakDuration # break after each list
+##     instruct = 300000 # getting through instructions
+##     listBreak = config.breakDuration # break after each list
 
-    # total session time
-    sessionTime = instruct + (listTime + listBreak)*config.nTotalLists
+##     # total session time
+##     sessionTime = instruct + (listTime + listBreak)*config.nTotalLists
 
-    # convert to minutes
-    sessionTime = sessionTime*(1./1000)*(1./60)
+##     # convert to minutes
+##     sessionTime = sessionTime*(1./1000)*(1./60)
 
-    return sessionTime
+##     return sessionTime
