@@ -1,0 +1,9 @@
+For each item, decide whether or not you find the item generally pleasant or unpleasant.
+
+Press 'N' for PLEASANT
+
+Press 'M' for UNPLEASANT
+
+Respond based on your first impulse.
+
+* Please press RETURN to continue *

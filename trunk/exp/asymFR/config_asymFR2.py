@@ -76,11 +76,14 @@ respPool = {'N':1, 'M':0}
 textFiles = dict()
 
 textFiles['introSess'] = 'text/introSess.txt'
+textFiles['introPleasant'] = 'text/introPleasant.txt'
 textFiles['introMath'] = 'text/introMath.txt'
 textFiles['introMathResponses'] = 'text/introMathResponses.txt'
 textFiles['introMathPractice'] = 'text/introMathPractice.txt'
 textFiles['introRecall'] = 'text/introRecall.txt'
 textFiles['introFinal'] = 'text/introFinal.txt'
+textFiles['introPractice'] = 'text/introPractice.txt'
+textFiles['introPractQuestions'] = 'text/introPractQuestions.txt'
 textFiles['introQuestions'] = 'text/introQuestions.txt'
 textFiles['introGetReady'] = 'text/introGetReady.txt'
 textFiles['trialBreak'] = 'text/trialBreak.txt'

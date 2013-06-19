@@ -114,6 +114,11 @@ def prepare(exp, config):
         answers.append(set_config[2])
         proposed.append(set_config[3])
 
+    if config.nPractLists > 0:
+        pract = True
+    else:
+        pract = False
+
     # save the prepared data; set state to first session, trial
     exp.saveState(state,
                   wp=wp,
@@ -130,7 +135,7 @@ def prepare(exp, config):
                   answers=answers,
                   proposed=proposed,
                   tcorrect=0,
-                  pract=True)
+                  pract=pract)
 
 def formatStr(format, input):
     """
@@ -474,6 +479,8 @@ def run(exp, config):
         # show complete instructions
         customInstruct('introSess')
         
+        customInstruct('introPleasant')
+        
         customInstruct('introMath')
         customInstruct('introMathResponses')
         customInstruct('introMathPractice')
@@ -516,10 +523,14 @@ def run(exp, config):
         customInstruct('introRecall')
         customInstruct('introFinal')
 
-        # pause for questions
-        customInstruct('introQuestions')
-        # prepare screen
-        customInstruct('introGetReady')
+        if state.pract:
+            # practice
+            customInstruct('introPractice')
+        else:
+            # pause for questions
+            customInstruct('introQuestions')
+            # prepare screen
+            customInstruct('introGetReady')
 
     # get the screen ready
     video.clear("black")
@@ -529,27 +540,15 @@ def run(exp, config):
         # check if we're still presenting lists
         while state.trialNum < config.nPractLists + config.nLists:
 
-            # add an if for done with practice
-            if state.trialNum == config.nPractLists:
+            # practice check
+            if state.pract and state.trialNum == config.nPractLists:
                 state.pract = False
                 exp.saveState(state)
+                
+                clock.wait()
+                customInstruct('introPractQuestions')
+                customInstruct('introGetReady')
 
-                # REPLACE WITH INSTRUCTIONS
-                # minimum break duration
-                breakText = Text(open(config.textFiles['trialBreak'],'r').read())
-                breakStim = video.showCentered(breakText)
-                video.updateScreen(clock)
-                video.unshow(breakStim)
-                clock.delay(config.breakDuration)
-                
-                # after break, wait for participant to continue
-                if config.breakSubjectControl:
-                    endBreakText = Text(open(config.textFiles['endBreak'],'r').read())
-                    timestamp = waitForAnyKey(clock, endBreakText)
-                    
-                    # log break
-                    logEvent(log, timestamp, 'REST')
-                
             elif state.trialNum > 0:
                 # minimum break duration
                 breakText = Text(open(config.textFiles['trialBreak'],'r').read())
