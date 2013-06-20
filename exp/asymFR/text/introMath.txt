@@ -2,7 +2,7 @@ After the last item in each list, you will be given the task of
 solving math problems. Two numbers will flash on the screen,
 followed by "=", then another number.
 
-You will be asked to press a key to indicate whether adding the
-first two numbers gives the last number.
+You will be asked to press a key to indicate whether the
+first number plus the second equals the third number.
 
 * Please press RETURN to continue *

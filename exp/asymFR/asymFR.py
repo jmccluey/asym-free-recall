@@ -198,7 +198,7 @@ def subjectError(errType, duration,
     """
 
     if errType=='slow':
-        errMsg = "Please try to respond quickly"
+        errMsg = "Please\nrespond\nquickly"
         logMsg = 'SLOW'
     else:
         errMsg = "Unknown error occured"
@@ -273,11 +273,22 @@ def trial(exp, config, clock, state, log, video, audio, mathlog,
 
         # sending in the clock tares the clock
         ts = video.updateScreen(clock)
-        clock.delay(config.wordDuration)
 
+        # delay only affects things with clocks
+        # show the fixation cross
+        video.clear()
+        fix = video.showCentered(fixationCross)
+        video.updateScreen(ts[0]+config.wordDuration)
+        
         # encoding task response
-        b, rt = resp_bc.waitWithTime(None, config.wordDuration)
+        b, rt = resp_bc.waitWithTime(None, config.wordDuration+config.wordISI, clock=clock)
+        
+        video.unshow(fix)
 
+        # wait out duration after button chooser
+        respTime = rt[0]-ts[0];
+        clock.delay(config.wordDuration+config.wordISI-respTime)
+        
         errType = None
         if not b:
             # participant didn't respond in time
@@ -292,24 +303,23 @@ def trial(exp, config, clock, state, log, video, audio, mathlog,
 
         # log the word 
         logEvent(log, ts, 'FR_PRES', trialno=trialNum, item=item, itemno=itemInd,
-                 category=cat, catno=catno, resp=resp, rt=rt[0]-ts[0])
+                 category=cat, catno=catno, resp=resp, rt=respTime)
 
         if errType:
             # tell the participant they made a mistake and log it
             video.clear()
             video.updateScreen(clock)
             subjectError(errType, config.msgDur, video, config, startBeep, log)
-
-        # show the fixation cross
-        video.clear()
-        fix = video.showCentered(fixationCross)
-        video.updateScreen(clock)
-        video.unshow(fix)
+            # extra ISI
+            video.clear()
+            fix = video.showCentered(fixationCross)
+            video.updateScreen(clock)
+            video.unshow(fix)
+            clock.delay(config.wordISI)
 
         # pause before we present the next word
-        isi = config.wordISI
         jitter = config.jitter
-        clock.delay(isi, jitter)
+        clock.delay(0, jitter)
 
     # pre distractor delay
     clock.delay(config.preDistractDelay, config.preDistractJitter)
@@ -480,6 +490,7 @@ def run(exp, config):
         customInstruct('introSess')
         
         customInstruct('introPleasant')
+        customInstruct('introFocus')
         
         customInstruct('introMath')
         customInstruct('introMathResponses')
@@ -543,6 +554,7 @@ def run(exp, config):
             # practice check
             if state.pract and state.trialNum == config.nPractLists:
                 state.pract = False
+                state.tcorrect = 0
                 exp.saveState(state)
                 
                 clock.wait()
