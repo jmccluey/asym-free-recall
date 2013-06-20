@@ -77,6 +77,7 @@ textFiles = dict()
 
 textFiles['introSess'] = 'text/introSess.txt'
 textFiles['introPleasant'] = 'text/introPleasant.txt'
+textFiles['introFocus'] = 'text/introFocus.txt'
 textFiles['introMath'] = 'text/introMath.txt'
 textFiles['introMathResponses'] = 'text/introMathResponses.txt'
 textFiles['introMathPractice'] = 'text/introMathPractice.txt'
