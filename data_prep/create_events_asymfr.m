@@ -29,7 +29,11 @@ function events = create_events_asymfr(sess_dir, subject, session)
 %   session          - session number
 %   trial            - trial number
 %   type             - type of the event (see above)
-%   list             - string identifier of word list
+%   category         - category of the item ('')
+%   catno            - category number of the item
+%   resp             - pleasantness response, 0 (unpleasant), 1 (pleasant)
+%   rt               - response time for pleasantness judgment
+%   listtype         - 0 (pure category), 1 (mixed categories)
 %   serialpos        - serial position in which word was presented
 %                      during the study list
 %   endmathcorrect - for WORD events, number of correct math problems
@@ -68,8 +72,10 @@ temp = read_session_log(session_log_file, {'mstime', 'msoffset', 'type'}, ...
 header_lines = max([find(strcmp({temp.type}, 'SESS_START')) 0]);
 
 % read the log file
-fields = {'mstime' 'msoffset' 'type' 'trial' 'list_name' 'item' 'itemno'};
-format = {'%n'     '%n'       '%s'   '%n'    '%s'       '%s'   '%n'};
+fields = {'mstime' 'msoffset' 'type' 'trial' 'item' 'itemno' 'cat' ...
+          'catno' 'resp' 'rt'};
+format = {'%n'     '%n'       '%s'   '%n'    '%s'   '%n'     '%s' ...
+          '%n'    '%n'   '%n'};
 full_log = read_session_log(session_log_file, fields, format, ...
                             'header_lines', header_lines);
 
@@ -79,10 +85,10 @@ current.session = session + 1;
 current.block = '';
 current.trial = NaN;
 current.list_pos = NaN;
-current.list_name = '';
 %current.distractor = NaN;
 current.mathcorrect = NaN;
 current.numproblems = NaN;
+current.list_type = NaN;
 
 % step through the logfile, adding events as necessary
 events = [];
@@ -97,11 +103,15 @@ for log=full_log
     current.block = 'ffr';
 
    case 'FR_PRES'
+    % skip practice trials
+    if log.trial == -1
+      continue
+    end
+        
     if current.trial ~= log.trial + 1
       % start of a new list
       current.trial = log.trial + 1;
       current.list_pos = 1;
-      current.list_name = log.list_name;
       list_study_events = [];
     end
     
@@ -116,19 +126,36 @@ for log=full_log
     event = event_template(current, log, 'WORD');
     event.item = upper(deblank(log.item));
     event.itemno = log.itemno;
-    event.list = log.list_name;
+    event.category = upper(deblank(log.cat));
+    event.catno = log.catno;
     event.serialpos = current.list_pos;
+    event.resp = log.resp;
+    if isnan(event.resp)
+      event.rt = NaN;
+    else
+      event.rt = log.rt;
+    end
     
     % move to next item
     current.list_pos = current.list_pos + 1;
     list_study_events = [list_study_events event];
     
    case 'DISTRACTOR'
+    % skip practice trials
+    if isnan(current.trial)
+      continue
+    end
+        
     % hold current values
     current.mathcorrect = log.itemno;
     current.numproblems = str2num(log.item);
     
    case 'REC_START'
+    % skip practice trials
+    if isnan(current.trial)
+      continue
+    end
+    
     if strcmp(current.block, 'fr')
       % end of item presentations
       % sanity check the list items
@@ -146,6 +173,15 @@ for log=full_log
           deal(current.mathcorrect);
       [list_study_events.endnumproblems] = ...
           deal(current.numproblems);
+      
+      % set list type
+      list_cats = unique([list_study_events.category]);
+      if ~isscalar(current.list_type)
+        current.list_type = 1;
+      else
+        current.list_type = 0;
+      end
+      [list_study_events.listtype] = deal(current.list_type);
     end
     
     % reset distractor
@@ -160,7 +196,6 @@ for log=full_log
       % no annotation yet; just include study events
       fprintf('Warning: missing annotate file: %s\n', ann_file)
       rec_start_event = event_template(current, log, 'REC_START');
-      rec_start_event.list = current.list_name;
       
       if strcmp(current.block, 'fr')
         events = [events list_study_events rec_start_event];
@@ -183,9 +218,6 @@ for log=full_log
       % recalled field undefined for REC_START
       fr_events(strcmp({fr_events.type}, 'REC_START')).recalled = ...
           NaN;
-      % set list name
-      fr_events(strcmp({fr_events.type}, 'REC_START')).list = ...
-          deal(current.list_name);
             
       % set the subsequent memory field on study events
       recalled = ~isnan([fr_events.rectime]) & strcmp({fr_events.type}, ...
@@ -204,7 +236,6 @@ for log=full_log
       % REC_START event
       rec_start_event = ffr_events(strcmp({ffr_events.type}, ...
                                           'REC_START'));
-      rec_start_event.list = 'ffr';
       rec_start_event.recalled = NaN;
       
       % FFR_REC_WORD events
@@ -251,7 +282,11 @@ function event = event_template(current, log, event_type)
                  'session',           current.session, ...
                  'trial',             current.trial,   ...
                  'type',              event_type,      ...
-                 'list',              '',              ...
+                 'category',          '',              ...
+                 'catno',             NaN,             ...
+                 'resp',              NaN,             ...
+                 'rt',                NaN,             ...
+                 'listtype',          NaN,             ...
                  'serialpos',         NaN,             ...
                  'endmathcorrect',    NaN,             ...
                  'endnumproblems',    NaN,             ...
