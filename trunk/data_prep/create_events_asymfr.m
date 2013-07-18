@@ -175,8 +175,8 @@ for log=full_log
           deal(current.numproblems);
       
       % set list type
-      list_cats = unique([list_study_events.category]);
-      if ~isscalar(current.list_type)
+      list_cats = unique([list_study_events.catno]);
+      if ~isscalar(list_cats)
         current.list_type = 1;
       else
         current.list_type = 0;
