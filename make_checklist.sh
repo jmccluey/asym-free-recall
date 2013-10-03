@@ -13,7 +13,7 @@ fi
 
 # hard-coded, must modify for each machine running experiments
 ASYM_DIR=$HOME/experiments/asymFR/exp/asymFR
-ARCHIVE="data"
+ARCHIVE="data2"
 
 SUBJID=$1
 SESSNO='0'
