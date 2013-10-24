@@ -64,9 +64,9 @@ def prepare(exp, config):
     (subjCatOrder, subjCatNames) = prep.subjCatOrder(exp, config)
     
     # set word order for this subject
-    (wp, wptot, wppract) = prep.extractPools(config.poolDir, config.namefile, config.practfile)
+    (wp, wptot) = prep.extractPools(config.poolDir, config.namefile, config.wasfile)
     
-    subjItems = prep.subjWordOrder(subjCatOrder, wp, wppract)
+    subjItems = prep.subjWordOrder(subjCatOrder, wp, config.WASthresh, config.maxTries)
 
     # write out all the to-be-presented items to text files
     for i in range(config.nSessions):
@@ -123,7 +123,6 @@ def prepare(exp, config):
     exp.saveState(state,
                   wp=wp,
                   wptot=wptot,
-                  wppract=wppract,
                   subjItems=subjItems,
                   subjCatOrder=subjCatOrder,
                   subjCatNames=subjCatNames,
@@ -260,13 +259,15 @@ def trial(exp, config, clock, state, log, video, audio, mathlog,
         catno = state.subjCatOrder[state.sessionNum][state.trialNum][n]
         itemText = Text(item, size=config.wordHeight)
 
-        # get itemno
+        # set trialNum
         if practice:
-            itemInd = state.wppract.index(item) + 1 # itemnos are one-indexed
             trialNum = -1
         else:
-            itemInd = state.wptot.index(item) + 1 # itemnos are one-indexed
             trialNum = state.trialNum - config.nPractLists
+
+        # get itemno
+        itemInd = state.wptot.index(item) + 1 # itemnos are one-indexed
+
 
         # PRESENT STIMULUS
         video.showProportional(itemText,.5,.5)
