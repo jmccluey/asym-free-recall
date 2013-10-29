@@ -182,5 +182,32 @@ tfKeys = ['N','M']
 
 fastConfig = False
 if fastConfig:
-    listLength = 6
-    recallDuration = 10000
+    instructISI = 500
+    preListDelay = 100
+    breakDuration = 500
+    
+    wordDuration = 100
+    wordISI = 50
+    jitter = 0
+    
+    msgDur = 50
+
+    preDistractDelay = 100
+    preDistractJitter = 0
+    
+    preRecallDelay = 100
+    preFinalDelay = 100
+    jitterBeforeRecall = 0
+    
+    recallDuration = 450
+    ffrDuration = 360
+    
+    maxDistractorLimit = 1000
+    minProblemTime = 40
+    numberDuration = 40
+    numberISI = 0
+    probISI = 40
+    probJitter = 0
+    setISI = 200
+
+    maxPracticeMath = 1500
