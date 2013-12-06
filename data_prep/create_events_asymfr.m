@@ -33,7 +33,7 @@ function events = create_events_asymfr(sess_dir, subject, session)
 %   catno            - category number of the item
 %   resp             - pleasantness response, 0 (unpleasant), 1 (pleasant)
 %   rt               - response time for pleasantness judgment
-%   listtype         - 0 (pure category), 1 (mixed categories)
+%   listtype         - 0 (pure category), 1 (mixed categories), 2 (Toronto)
 %   serialpos        - serial position in which word was presented
 %                      during the study list
 %   endmathcorrect - for WORD events, number of correct math problems
@@ -178,6 +178,8 @@ for log=full_log
       list_cats = unique([list_study_events.catno]);
       if ~isscalar(list_cats)
         current.list_type = 1;
+      elseif list_cats == 0
+        current.list_type = 2; % Toronto noun pool
       else
         current.list_type = 0;
       end
