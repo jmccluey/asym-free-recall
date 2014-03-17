@@ -62,7 +62,7 @@ if ~exist('session', 'var')
           'No session number specified. "session" field will be empty.')
   session = [];
 end
-if ~exist('wp','var')
+if ~exist('wp','var') | isempty(wp)
   warning('No wordpool selected. Itemnos may be incorrect in session log.')
   wp = {};
 end
@@ -140,9 +140,9 @@ for log=full_log
       event.rt = log.rt;
     end
     
-    % correct itemno from wordpool
+    % correct itemno using wordpool
     if ~isempty(wp)
-      thisitem = strcmp(event.itemno,wp);
+      thisitem = strcmp(event.item,wp);
       if any(thisitem)
         event.itemno = find(thisitem);
       end
