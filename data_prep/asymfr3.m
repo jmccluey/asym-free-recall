@@ -10,18 +10,23 @@ function exp = asymfr3(varargin)
 %  PARAMS:
 %  May be specified using property, value pairs. Defaults are shown
 %  in parentheses.
-%   dataroot     - path to directory where subject data directories
-%                  are located ('data/beh/asymFR3')
-%   res_dir      - path to directory where results will be saved.
-%                  ('data/beh/asymFR3')
-%   force_events - logical indicating whether to force creation of
-%                  events for all sessions, regardless of whether
-%                  the source files have been modified (false)
+%   dataroot      - path to directory where subject data directories
+%                   are located ('data/beh/asymFR3')
+%   res_dir       - path to directory where results will be saved.
+%                   ('data/beh/asymFR3')
+%   force_events  - logical indicating whether to force creation of
+%                   events for all sessions, regardless of whether
+%                   the source files have been modified (false)
+%   wordpool_file - path to overall wordpool for experiment,
+%                   corrects incorrect session log itemnos
+%                   ('data/beh/asymFR3/asymfr_wordpool.txt')
 
 % options
 defaults.dataroot = '/data/beh/asymFR3';
 defaults.res_dir = defaults.dataroot;
 defaults.force_events = false;
+defaults.wordpool_file = fullfile(defaults.dataroot, ...
+                                  'asymfr_wordpool.txt');
 params = propval(varargin, defaults);
 
 params.dataroot = check_dir(params.dataroot);
@@ -31,6 +36,13 @@ params.res_dir = check_dir(params.res_dir);
 subj = get_sessdirs(params.dataroot, 'ASM*', {'session.log'});
 exp = init_exp('asymFR3', 'subj', subj, 'resDir', params.res_dir);
 
+% read wordpool (requires wordpools project)
+if exist(params.wordpool_file,'file') & exist('read_wordpool')==2
+  wp = read_wordpool(params.wordpool_file);
+else
+  wp = {};
+end
+
 % create events
 if params.force_events
   inputs = {'force', true};
@@ -38,7 +50,7 @@ else
   inputs = {};
 end
 exp.subj = apply_to_subj(exp.subj, @create_events, ...
-                         {@create_events_asymfr, {}, inputs{:}});
+                         {@create_events_asymfr, {wp}, inputs{:}});
 
 % import events
 events_dir = fullfile(params.res_dir, 'beh', 'all');
