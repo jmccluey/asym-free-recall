@@ -1,4 +1,4 @@
-function events = create_events_asymfr(sess_dir, subject, session)
+function events = create_events_asymfr(sess_dir, subject, session, wp)
 %CREATE_EVENTS_ASYMFR   Create an events structure for a session of
 %                       Asymmetry Free Recall
 %
@@ -61,6 +61,10 @@ if ~exist('session', 'var')
   warning('EventsCreation:noSessionNumber', ...
           'No session number specified. "session" field will be empty.')
   session = [];
+end
+if ~exist('wp','var')
+  warning('No wordpool selected. Itemnos may be incorrect in session log.')
+  wp = {};
 end
 
 % get the number of header lines to exclude from the log file
@@ -135,6 +139,16 @@ for log=full_log
     else
       event.rt = log.rt;
     end
+    
+    % correct itemno from wordpool
+    if ~isempty(wp)
+      thisitem = strcmp(event.itemno,wp);
+      if any(thisitem)
+        event.itemno = find(thisitem);
+      end
+      
+      % else default NaN
+    end    
     
     % move to next item
     current.list_pos = current.list_pos + 1;
