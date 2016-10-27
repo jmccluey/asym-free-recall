@@ -1,0 +1,8 @@
+Press 'N' if the answer is TRUE.
+
+Press 'M' if the answer is FALSE.
+
+Each math period lasts several seconds; you may be able to answer
+a few problems during each one.
+
+* Please press RETURN to continue *
