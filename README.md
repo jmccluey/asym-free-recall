@@ -1,8 +1,14 @@
 # Asymmetry Free Recall
 
-A psychology study examining semantic relatedness and organization in memory.
+A psychology study examining semantic relatedness and organization in memory.  This project expands on the basic structure introduced by the [immediate-free-recall](https://github.com/jmccluey/immediate-free-recall) project to show how it can be used to examine more developed scientific questions.
 
-This study examines a particular phenomenon in memory research regarding the order in which presented information is later recalled, and how the relatedness of information affects that organzation.  An example of related objects is "cat" and "dog" (more related), vs. "cat" and "spoon" (less related).  It is titled "Asymmetry" Free Recall because it examines the asymmetrical forward-going nature of contiguity effect, as described in the abstract below.
+Some specific differences:
+- Multiple experimental conditions, i.e., not all lists are the same, but differ in semantic relatedness (more related, less related, completely random).
+- Counterbalancing of conditions, such that list types are spread out evenly throughout the study.
+- A math distractor at the end of each list to prevent overt rehearsal of items.  This is known as delayed free recall.
+- User-controlled breaks between each list.
+
+In particular, this study examines a particular phenomenon in memory research regarding the order in which presented information is later recalled, and how the relatedness of information affects that organzation.  An example of related objects is "cat" and "dog" (more related), vs. "cat" and "spoon" (less related).  It is titled "Asymmetry" Free Recall because it examines the asymmetrical forward-going nature of contiguity effect, as described in the abstract below.
 
 The paradigm is designed and written using [PyEPL](http://pyepl.sourceforge.net/), a Python-based experiment programming library.  The collected data is then organized and analyzed using MATLAB.
 
