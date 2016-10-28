@@ -8,31 +8,41 @@ Some specific differences:
 - A math distractor at the end of each list to prevent overt rehearsal of items.  This is known as delayed free recall.
 - User-controlled breaks between each list.
 
-In particular, this study examines a particular phenomenon in memory research regarding the order in which presented information is later recalled, and how the relatedness of information affects that organzation.  An example of related objects is "cat" and "dog" (more related), vs. "cat" and "spoon" (less related).  It is titled "Asymmetry" Free Recall because it examines the asymmetrical forward-going nature of contiguity effect, as described in the abstract below.
+In particular, this study examines a particular phenomenon in memory research regarding the order in which presented information is later recalled, and how the relatedness of information affects that organzation.  An example of related objects is "cat" and "dog" (more related), vs. "cat" and "spoon" (less related).  It is titled "Asymmetry" Free Recall because it examines the asymmetrical forward-going nature of contiguity effect, as described in the _Abstract_ below.
 
 The paradigm is designed and written using [PyEPL](http://pyepl.sourceforge.net/), a Python-based experiment programming library.  The collected data is then organized and analyzed using MATLAB.
 
 ## Contents
 
-The current project contains the code used to run the paradigm and prepare the data for further analysis.
+The current project contains the code used to run the paradigm and prepare the data for further analysis.  In the research lab, various stages of analysis are contained in different SVN projects.  Those components currently reside in other projects, but they will be compiled into this project shortly.
 
 This project will be expanded to include:
-- [x] Paradigm code in PyEPL
-- [x] Data preparation scripts
-- [ ] Behavioral data
-- [ ] Scripts for running primary analyses of interest
-- [ ] Basic computational modeling code using the [NeuroCognitive Memory Search](https://memory.psy.vanderbilt.edu/w/index.php/NCMS_Toolbox) toolbox
-- [ ] An academic poster presented based on the results of this work
+- [x] **_exp_**, **_bin_** - Paradigm code in PyEPL
+- [x] **_data_prep_** - Data preparation scripts
+- [ ] **_beh_data_** - Behavioral data (_to be added_)
+- [ ] **_beh_analysis_** - Scripts for running primary analyses of interest (_to be updated_)
+- [ ] **_comp_model_** - Basic computational modeling code (_to be added_)
+- [ ] **_poster_** - An academic poster presented based on the results of this work (_to be added_)
 
-As this study was developed and performed by the researchers who designed it, stand-alone documentation is under development.
+Documentation shall be refined as various components are added.
+
+## Design ##
+
+There are two main studies associated with this project.
+
+**_Experiment 1._** - 24 lists of 12 items each.  Half of the lists contain items that are highly related to each other.  The other half are composed of items from different categories.  After each list, the participant performs 10 seconds of math, then has 45 seconds to recall as many words from the most recent list.
+
+**_Experiment 2._** - This study added a third condition where list items were drawn from a large wordpool of random words, rather than lists of "categorized" materials.  A semantic similarity score was used to ensure that no two words were too similar.  Each condition had 8 lists; otherwise, the design is very similar to study 1.
 
 ## Versions (Releases)
 
-While analysis code can be performed on any variant of the study, to run the paradigm it is recommended that you download the specific release associated with each version of the study.  This experiment involved one pilot and two main studies.
+While the analysis code is designed to be somewhat backwards-compatible across released versions, the code for running the paradigm is not. As such, it is recommended that you download the specific release associated with each version of the study if you wish to run it.  This experiment involved one pilot and two main studies.
 
-- **version_1.0** - A basic pilot of the general concept of the paradigm.
-- **version_2.0** - _Main experiment 1._ This experiment presented lists of either semantically related or semantically less-related words.
-- **version_3.0** - _Main experiment 2._ This experiment expanded on _version_2.0_ by adding a third type of list of words drawn from an entirely random wordpool.  It also improved upon various design aspects that could affect interpretation of results of _version_2.0_.
+- **version_1.0: asymFR** - A basic pilot of the general concept of the paradigm.
+- **version_2.0: asymFR2** - _Experiment 1._ This experiment presented lists of either semantically related or semantically less-related words.
+- **version_3.0: asymFR3** - _Experiment 2._ This experiment expanded on _version_2.0_ by adding a third type of list of words drawn from an entirely random wordpool.  It also improved upon various design aspects that could affect interpretation of results of _version_2.0_.
+
+For a brief overview of the main studies, see the poster under _Publications_ below.
 
 ## Dependencies
 
