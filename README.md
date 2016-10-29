@@ -4,6 +4,7 @@ A psychology study examining semantic relatedness and organization in memory.  T
 
 Some specific differences:
 - Multiple experimental conditions, i.e., not all lists are the same, but differ in semantic relatedness (more related, less related, completely random).
+- Participants made a pleasant judgment on each item using a keypress ('N'=pleasant,'M'=unpleasant).
 - Counterbalancing of conditions, such that list types are spread out evenly throughout the study.
 - A math distractor at the end of each list to prevent overt rehearsal of items.  This is known as delayed free recall.
 - User-controlled breaks between each list.
@@ -19,7 +20,7 @@ The current project contains the code used to run the paradigm and prepare the d
 This project will be expanded to include:
 - [x] **_exp_**, **_bin_** - Paradigm code in PyEPL
 - [x] **_data_prep_** - Data preparation scripts
-- [ ] **_beh_data_** - Behavioral data (_to be added_)
+- [x] **_beh_data_** - Behavioral data
 - [ ] **_beh_analysis_** - Scripts for running primary analyses of interest (_to be updated_)
 - [ ] **_comp_model_** - Basic computational modeling code (_to be added_)
 - [ ] **_poster_** - An academic poster presented based on the results of this work (_to be added_)
